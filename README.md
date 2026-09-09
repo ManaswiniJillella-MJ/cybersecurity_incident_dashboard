@@ -1,17 +1,37 @@
-# cybersecurity_incident_dashboard
+# Cybersecurity Incident Dashboard
 
-A new Flutter project.
+A Flutter-based application for monitoring and viewing cybersecurity incidents.
+
+## Project Description
+
+The Cybersecurity Incident Dashboard provides a simple interface to display cybersecurity incidents, their severity, and their current status.
+
+## Features
+
+- View total number of incidents
+- View critical and high-severity incidents
+- View incident status
+- Display recent security incidents
+- View incident details
+- Filter incidents based on severity
+
+## Technologies Used
+
+- Flutter
+- Dart
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
+- Flutter SDK
+- Dart SDK
+- VS Code or Android Studio
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### Installation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Clone the repository:
+
+```bash
+git clone https://github.com/ManaswiniJillella-MJ/cybersecurity_incident_dashboard.git
+```
