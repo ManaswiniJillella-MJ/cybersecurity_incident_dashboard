@@ -58,7 +58,17 @@ class CybersecurityDashboard extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const DashboardScreen(),
+      initialRoute: "/",
+      routes: {"/": (context) => const DashboardScreen()},
+      onGenerateRoute: (settings) {
+        if (settings.name == "/incident-details") {
+          final incident = settings.arguments as Incident;
+          return MaterialPageRoute(
+            builder: (context) => IncidentDetailsScreen(incident: incident),
+          );
+        }
+        return null;
+      },
     );
   }
 }
@@ -185,12 +195,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               severity: incident.severity,
                             ),
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushNamed(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      IncidentDetailsScreen(incident: incident),
-                                ),
+                                "/incident-details",
+                                arguments: incident,
                               );
                             },
                           ),
