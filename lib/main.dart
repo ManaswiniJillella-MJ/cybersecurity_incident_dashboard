@@ -148,7 +148,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 12),
             Expanded(
               child: filteredIncidents.isEmpty
-                  ? const Center(child: Text('No incidents found.'))
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.search_off,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'No incidents found',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'No incidents match the '
+                            '${incidentProvider.selectedSeverity} severity filter.',
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          if (incidentProvider.selectedSeverity != 'All')
+                            OutlinedButton.icon(
+                              onPressed: () => context
+                                  .read<IncidentProvider>()
+                                  .setSeverity('All'),
+                              icon: const Icon(Icons.filter_alt_off),
+                              label: const Text('Clear filter'),
+                            ),
+                        ],
+                      ),
+                    )
                   : ListView.builder(
                       itemCount: filteredIncidents.length,
                       itemBuilder: (context, index) {
