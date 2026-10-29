@@ -57,6 +57,29 @@ void main() {
       expect(notified, isTrue);
     });
 
+    test('resets the severity filter to show all incidents', () {
+      provider.setSeverity('High');
+      expect(provider.filteredIncidents.length, 2);
+
+      provider.setSeverity('All');
+
+      expect(provider.selectedSeverity, 'All');
+      expect(provider.filteredIncidents.length, 4);
+    });
+
+    test('notifies listeners when the severity filter changes', () {
+      var notified = false;
+      provider.addListener(() {
+        notified = true;
+      });
+
+      provider.setSeverity('Critical');
+
+      expect(notified, isTrue);
+      expect(provider.selectedSeverity, 'Critical');
+      expect(provider.filteredIncidents.length, 1);
+    });
+
     test('returns an unmodifiable incident list', () {
       expect(
         () => provider.incidents.add(
