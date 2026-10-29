@@ -1,50 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'providers/incident_provider.dart';
 
 import 'models/incident.dart';
 import 'screens/incident_details_screen.dart';
+import 'screens/api_reports_screen.dart';
+import 'screens/report_incident_screen.dart';
 import 'widgets/severity_badge.dart';
 
 void main() {
-  runApp(const CybersecurityDashboard());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => IncidentProvider(),
+      child: const CybersecurityDashboard(),
+    ),
+  );
 }
-
-const List<Incident> sampleIncidents = [
-  Incident(
-    id: 'INC-001',
-    title: 'Phishing Attack',
-    description:
-        'A suspicious email was detected attempting to steal user credentials.',
-    severity: 'High',
-    status: 'Open',
-    category: 'Phishing',
-  ),
-  Incident(
-    id: 'INC-002',
-    title: 'Malware Detection',
-    description: 'Malicious software was detected on an employee workstation.',
-    severity: 'Critical',
-    status: 'Investigating',
-    category: 'Malware',
-  ),
-  Incident(
-    id: 'INC-003',
-    title: 'Brute Force Attack',
-    description:
-        'Multiple failed login attempts were detected on a user account.',
-    severity: 'Medium',
-    status: 'Resolved',
-    category: 'Unauthorized Access',
-  ),
-  Incident(
-    id: 'INC-004',
-    title: 'Data Leak',
-    description:
-        'A potential exposure of confidential information requires investigation.',
-    severity: 'High',
-    status: 'Open',
-    category: 'Data Security',
-  ),
-];
 
 class CybersecurityDashboard extends StatelessWidget {
   const CybersecurityDashboard({super.key});
@@ -59,7 +31,11 @@ class CybersecurityDashboard extends StatelessWidget {
         useMaterial3: true,
       ),
       initialRoute: "/",
-      routes: {"/": (context) => const DashboardScreen()},
+      routes: {
+        "/": (context) => const DashboardScreen(),
+        "/api-reports": (context) => const ApiReportsScreen(),
+        "/report-incident": (context) => const ReportIncidentScreen(),
+      },
       onGenerateRoute: (settings) {
         if (settings.name == "/incident-details") {
           final incident = settings.arguments as Incident;
@@ -81,34 +57,38 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  String selectedSeverity = 'All';
-
   @override
   Widget build(BuildContext context) {
-    final filteredIncidents = selectedSeverity == 'All'
-        ? sampleIncidents
-        : sampleIncidents
-              .where(
-                (incident) =>
-                    incident.severity.toLowerCase() ==
-                    selectedSeverity.toLowerCase(),
-              )
-              .toList();
+    final incidentProvider = context.watch<IncidentProvider>();
+    final filteredIncidents = incidentProvider.filteredIncidents;
+    final incidents = incidentProvider.incidents;
 
-    final criticalCount = sampleIncidents
+    final criticalCount = incidents
         .where((incident) => incident.severity == 'Critical')
         .length;
-    final highCount = sampleIncidents
+    final highCount = incidents
         .where((incident) => incident.severity == 'High')
         .length;
-    final resolvedCount = sampleIncidents
+    final resolvedCount = incidents
         .where((incident) => incident.status == 'Resolved')
         .length;
 
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            tooltip: 'API Demo Reports',
+            icon: const Icon(Icons.cloud_download_outlined),
+            onPressed: () => Navigator.pushNamed(context, "/api-reports"),
+          ),
+        ],
         title: const Text('Cybersecurity Dashboard'),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.pushNamed(context, "/report-incident"),
+        icon: const Icon(Icons.add),
+        label: const Text("Report Incident"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8),
@@ -131,10 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   mainAxisSpacing: 12,
                   childAspectRatio: 1.3,
                   children: [
-                    _statCard(
-                      "Total Incidents",
-                      sampleIncidents.length.toString(),
-                    ),
+                    _statCard("Total Incidents", incidents.length.toString()),
                     _statCard("Critical", criticalCount.toString()),
                     _statCard("High", highCount.toString()),
                     _statCard("Resolved", resolvedCount.toString()),
@@ -149,7 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              initialValue: selectedSeverity,
+              initialValue: incidentProvider.selectedSeverity,
               decoration: const InputDecoration(
                 labelText: 'Filter by severity',
                 border: OutlineInputBorder(),
@@ -164,9 +141,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   .toList(),
               onChanged: (value) {
                 if (value != null) {
-                  setState(() {
-                    selectedSeverity = value;
-                  });
+                  context.read<IncidentProvider>().setSeverity(value);
                 }
               },
             ),
@@ -224,9 +199,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 450),
+              switchInCurve: Curves.easeOutBack,
+              transitionBuilder: (child, animation) =>
+                  ScaleTransition(scale: animation, child: child),
+              child: Text(
+                value,
+                key: ValueKey(value),
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
