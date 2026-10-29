@@ -39,8 +39,8 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     context.read<IncidentProvider>().addIncident(
-      title: _titleController.text,
-      description: _descriptionController.text,
+      title: _titleController.text.trim(),
+      description: _descriptionController.text.trim(),
       severity: _severity,
       category: _category,
     );
