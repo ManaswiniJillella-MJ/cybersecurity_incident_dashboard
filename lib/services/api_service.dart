@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 class ApiReport {
@@ -25,7 +24,9 @@ class ApiReport {
 class ApiService {
   static Future<List<ApiReport>> fetchReports() async {
     final response = await http
-        .get(Uri.parse('https://jsonplaceholder.typicode.com/posts?_limit=5'))
+        .get(
+          Uri.https('jsonplaceholder.typicode.com', '/posts', {'_limit': '5'}),
+        )
         .timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
