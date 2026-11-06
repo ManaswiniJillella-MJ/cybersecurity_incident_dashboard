@@ -22,21 +22,31 @@ class ApiReport {
 }
 
 class ApiService {
-  static Future<List<ApiReport>> fetchReports() async {
-    final response = await http
-        .get(
-          Uri.https('jsonplaceholder.typicode.com', '/posts', {'_limit': '5'}),
-        )
-        .timeout(const Duration(seconds: 15));
+  static Future<List<ApiReport>> fetchReports({http.Client? client}) async {
+    final httpClient = client ?? http.Client();
 
-    if (response.statusCode != 200) {
-      throw Exception('API request failed: ${response.statusCode}');
+    try {
+      final response = await httpClient
+          .get(
+            Uri.https('jsonplaceholder.typicode.com', '/posts', {
+              '_limit': '5',
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode != 200) {
+        throw Exception('API request failed: ${response.statusCode}');
+      }
+
+      final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+
+      return data
+          .map((item) => ApiReport.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } finally {
+      if (client == null) {
+        httpClient.close();
+      }
     }
-
-    final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
-
-    return data
-        .map((item) => ApiReport.fromJson(item as Map<String, dynamic>))
-        .toList();
   }
 }
