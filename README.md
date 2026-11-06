@@ -93,7 +93,11 @@ Capture the API screen and service code in `screenshots/experiment-09/`.
 
 ### Experiment 10 – Testing and Debugging
 Relevant files: `test/incident_provider_test.dart`, `test/widget_test.dart`.
-Run `flutter analyze` and `flutter test`. Capture the results and any genuine debugging evidence in `screenshots/experiment-10/`.
+Validation results:
+- `flutter analyze` — No issues found.
+- `flutter test` — All 27 tests passed.
+
+Capture the analyzer and test results in `screenshots/experiment-10/`.
 
 ## Getting Started
 
