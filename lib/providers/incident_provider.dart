@@ -39,19 +39,30 @@ class IncidentProvider extends ChangeNotifier {
   ];
 
   String _selectedSeverity = 'All';
+  String _searchQuery = '';
+
+  String get searchQuery => _searchQuery;
 
   List<Incident> get incidents => List.unmodifiable(_incidents);
 
   String get selectedSeverity => _selectedSeverity;
 
   List<Incident> get filteredIncidents {
-    if (_selectedSeverity == 'All') {
-      return incidents;
-    }
+    return _incidents.where((incident) {
+      final matchesSeverity =
+          _selectedSeverity == 'All' || incident.severity == _selectedSeverity;
 
-    return _incidents
-        .where((incident) => incident.severity == _selectedSeverity)
-        .toList();
+      final query = _searchQuery.trim().toLowerCase();
+
+      final matchesSearch =
+          query.isEmpty ||
+          incident.id.toLowerCase().contains(query) ||
+          incident.title.toLowerCase().contains(query) ||
+          incident.description.toLowerCase().contains(query) ||
+          incident.category.toLowerCase().contains(query);
+
+      return matchesSeverity && matchesSearch;
+    }).toList();
   }
 
   int get totalCount => _incidents.length;
@@ -91,5 +102,16 @@ class IncidentProvider extends ChangeNotifier {
 
     _selectedSeverity = severity;
     notifyListeners();
+  }
+
+  void setSearchQuery(String query) {
+    if (_searchQuery == query) return;
+
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    setSearchQuery('');
   }
 }

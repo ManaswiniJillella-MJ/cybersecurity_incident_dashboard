@@ -95,5 +95,75 @@ void main() {
         throwsUnsupportedError,
       );
     });
+    test('starts with an empty search query', () {
+      expect(provider.searchQuery, '');
+      expect(provider.filteredIncidents.length, 4);
+    });
+
+    test('searches incidents by ID', () {
+      provider.setSearchQuery('INC-004');
+
+      expect(provider.filteredIncidents.length, 1);
+      expect(provider.filteredIncidents.first.title, 'Data Leak');
+    });
+
+    test('searches incidents by title case-insensitively', () {
+      provider.setSearchQuery('mALwArE');
+
+      expect(provider.filteredIncidents.length, 1);
+      expect(provider.filteredIncidents.first.title, 'Malware Detection');
+    });
+
+    test('searches incidents by description', () {
+      provider.setSearchQuery('credentials');
+
+      expect(provider.filteredIncidents.length, 1);
+      expect(provider.filteredIncidents.first.id, 'INC-001');
+    });
+
+    test('searches incidents by category', () {
+      provider.setSearchQuery('Unauthorized Access');
+
+      expect(provider.filteredIncidents.length, 1);
+      expect(provider.filteredIncidents.first.id, 'INC-003');
+    });
+
+    test('combines search with severity filtering', () {
+      provider.setSeverity('High');
+      provider.setSearchQuery('attack');
+
+      expect(provider.filteredIncidents.length, 1);
+      expect(provider.filteredIncidents.first.id, 'INC-001');
+      expect(
+        provider.filteredIncidents.every(
+          (incident) => incident.severity == 'High',
+        ),
+        isTrue,
+      );
+    });
+
+    test('clears search and restores filtered incidents', () {
+      provider.setSearchQuery('malware');
+
+      expect(provider.filteredIncidents.length, 1);
+
+      provider.clearSearch();
+
+      expect(provider.searchQuery, '');
+      expect(provider.filteredIncidents.length, 4);
+    });
+
+    test('notifies listeners when search query changes', () {
+      var notified = false;
+
+      provider.addListener(() {
+        notified = true;
+      });
+
+      provider.setSearchQuery('phishing');
+
+      expect(notified, isTrue);
+      expect(provider.searchQuery, 'phishing');
+    });
   });
 }
