@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
 class ApiReportsScreen extends StatefulWidget {
-  const ApiReportsScreen({super.key});
+  final Future<List<ApiReport>> Function()? fetchReports;
+
+  const ApiReportsScreen({super.key, this.fetchReports});
 
   @override
   State<ApiReportsScreen> createState() => _ApiReportsScreenState();
@@ -43,12 +45,13 @@ class _ApiReportsScreenState extends State<ApiReportsScreen> {
   @override
   void initState() {
     super.initState();
-    _reportsFuture = ApiService.fetchReports();
+    _reportsFuture = (widget.fetchReports ?? () => ApiService.fetchReports())();
   }
 
   void _retry() {
     setState(() {
-      _reportsFuture = ApiService.fetchReports();
+      _reportsFuture =
+          (widget.fetchReports ?? () => ApiService.fetchReports())();
     });
   }
 
